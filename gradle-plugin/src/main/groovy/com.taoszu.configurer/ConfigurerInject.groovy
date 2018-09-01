@@ -65,12 +65,10 @@ class ConfigurerInject {
         }
     }
 
-    static boolean isInterface
     /**
      * Delegate static code block
      */
     private static class AptClassVisitor extends ClassVisitor {
-        String owner
 
         AptClassVisitor(ClassVisitor cv) {
             super(Opcodes.ASM5, cv)
@@ -79,32 +77,22 @@ class ConfigurerInject {
         @Override
         void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
             super.visit(version, access, name, signature, superName, interfaces)
-            owner = name
-            isInterface = (access & Opcodes.ACC_INTERFACE) != 0
         }
 
         @Override
         MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
             MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions)
             if (name == "load") {
-                mv = new ClinitMethodVisitor(mv, owner)
+                mv = new ClinitMethodVisitor(mv)
             }
             return mv
-        }
-
-        @Override
-        void visitEnd() {
-            cv.visitEnd()
         }
     }
 
 
     private static class ClinitMethodVisitor extends MethodVisitor {
-        String owner
-
-        ClinitMethodVisitor(MethodVisitor mv, String owner) {
+        ClinitMethodVisitor(MethodVisitor mv) {
             super(Opcodes.ASM5, mv)
-            this.owner = owner
         }
 
         @Override
@@ -112,28 +100,14 @@ class ConfigurerInject {
             Scanner.classNameMap.each { record ->
                 String module = record.getKey()
                 String className = record.getValue()
-                project.logger.error(module + " -> " + className)
 
-                mv.visitFieldInsn(Opcodes.GETSTATIC, "com/taoszu/configurer/FactoryHtub", "factoryMap", "Ljava/util/Map;")
+                mv.visitFieldInsn(Opcodes.GETSTATIC, "com/taoszu/configurer/FactoryHub", "factoryMap", "Ljava/util/Map;")
                 mv.visitLdcInsn(module)
-                mv.visitLdcInsn(className)
+                mv.visitLdcInsn(className.replaceAll("/", "."))
                 mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true)
             }
 
-
             super.visitCode()
-        }
-
-        @Override
-        void visitInsn(int opcode) {
-            project.logger.error("opcode " + opcode)
-            mv.visitInsn(opcode)
-        }
-
-
-        @Override
-        void visitMaxs(int maxStack, int maxLocals) {
-            mv.visitMaxs(maxStack + 4, maxLocals)
         }
 
     }

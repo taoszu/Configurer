@@ -12,14 +12,12 @@ import java.util.jar.JarFile
 class Scanner {
 
 
-    static final String HUB_CLASS = "com/taoszu/configurer/FactoryHtub.class"
+    static final String HUB_CLASS = "com/taoszu/configurer/FactoryHub.class"
 
 
     static final Map<String, String> classNameMap = new HashMap<>()
 
-    private static final String APT_CLASS_PACKAGE_NAME = "com/taoszu/configurer/apt"
-
-    private static final String APT_CLASS_PACKAGE_NAME_ = "com/taoszu/configurer/apt/"
+    private static final String APT_CLASS_PACKAGE_NAME = "com/taoszu/configurer/apt/"
 
     private static
     final Set<String> excludeJar = ["com.android.support", "android.arch.", "androidx."]
@@ -86,7 +84,7 @@ class Scanner {
         }
 
         String capitalize(String className) {
-            String moduleName = className.replaceAll("Factory", "").replaceAll(APT_CLASS_PACKAGE_NAME_, "")
+            String moduleName = className.replaceAll("Factory", "").replaceAll(APT_CLASS_PACKAGE_NAME, "")
             return moduleName.toLowerCase()
         }
     }

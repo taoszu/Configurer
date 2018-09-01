@@ -8,17 +8,10 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.WildcardTypeName;
 import com.taoszu.configurer.Constant;
-import com.taoszu.configurer.FactoryHtub;
 import com.taoszu.configurer.Logger;
 import com.taoszu.configurer.annotation.Worker;
 
-import org.objectweb.asm.*;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -97,20 +90,20 @@ public class WorkerProcessor extends AbstractProcessor {
             ClassName.get(Map.class), ClassName.get(String.class),
             ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)));
 
+    String className = capitalize(module) + Constant.FACTORY_SUFFIX;
+
     ParameterSpec mapParameterSpec = ParameterSpec.builder(mapTypeName, paramName).build();
-    MethodSpec.Builder methodInit = MethodSpec.methodBuilder(Constant.FACTORY_METHOD)
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .addParameter(mapParameterSpec);
+    MethodSpec.Builder methodInit = MethodSpec.constructorBuilder()
+            .addModifiers(Modifier.PUBLIC);
+
 
     for (TypeElement element : elementSet) {
       Worker worker = element.getAnnotation(Worker.class);
       methodInit.addStatement(paramName + ".put($S, $T.class)", worker.key(), ClassName.get(element));
     }
 
-    TypeElement interfaceType = processingEnv.getElementUtils().getTypeElement(Constant.FACTORY_INTERFACE);
-    TypeSpec type = TypeSpec.classBuilder(capitalize(module) + Constant.FACTORY_SUFFIX)
-            .addSuperinterface(ClassName.get(interfaceType))
+    TypeSpec type = TypeSpec.classBuilder(className)
+            .superclass(ClassName.bestGuess(Constant.FACTORY_INTERFACE))
             .addModifiers(Modifier.PUBLIC)
             .addMethod(methodInit.build())
             .build();
@@ -120,47 +113,6 @@ public class WorkerProcessor extends AbstractProcessor {
       e.printStackTrace();
     }
   }
-
-
-  /**
-   * Delegate static code block
-   */
-  private static class AptClassVisitor extends ClassVisitor {
-    AptClassVisitor(ClassVisitor cv) {
-      super(Opcodes.ASM5, cv);
-    }
-
-    @Override
-    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-      MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-      mLogger.error(name);
-      if (name.equals("<add>")) {
-        mv = new ClinitMethodVisitor(mv, name);
-      }
-      return mv;
-    }
-  }
-
-
-  private static class ClinitMethodVisitor extends MethodVisitor {
-    String owner;
-
-    ClinitMethodVisitor(MethodVisitor mv, String owner) {
-      super(Opcodes.ASM5, mv);
-      this.owner = owner;
-    }
-
-    @Override
-    public void visitIntInsn(int i, int i1) {
-      super.visitIntInsn(i, i1);
-      mv.visitCode();
-      mv.visitFieldInsn(Opcodes.GETSTATIC, owner, "timer", "J");
-      mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/System", "currentTimeMillis", "()J", false);
-      mv.visitInsn(Opcodes.LSUB);
-      mv.visitFieldInsn(Opcodes.PUTSTATIC, owner, "timer", "J");
-    }
-  }
-
 
 
     private String capitalize(CharSequence self) {
