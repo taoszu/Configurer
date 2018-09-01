@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.taoszu.configurer'
-
+if (Boolean.valueOf(applyConfigurerPlugin)) {
+    apply plugin: 'com.taoszu.configurer'
+}
 
 android {
     compileSdkVersion 28
