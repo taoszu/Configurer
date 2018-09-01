@@ -8,9 +8,17 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.WildcardTypeName;
 import com.taoszu.configurer.Constant;
+import com.taoszu.configurer.FactoryHtub;
+import com.taoszu.configurer.Logger;
 import com.taoszu.configurer.annotation.Worker;
 
+import org.objectweb.asm.*;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,9 +38,14 @@ import javax.lang.model.element.TypeElement;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class WorkerProcessor extends AbstractProcessor {
 
+  private static Logger mLogger;
+
+
   @Override
   public synchronized void init(ProcessingEnvironment processingEnvironment) {
     super.init(processingEnvironment);
+
+    mLogger = new Logger(processingEnvironment.getMessager());
   }
 
   @Override
@@ -46,15 +59,20 @@ public class WorkerProcessor extends AbstractProcessor {
       typeElements.add((TypeElement) element);
     }
     genWorkerMap(typeElements);
+
     return true;
   }
 
+
+  private Set<String> moduleSet = new HashSet<>();
 
   private void genWorkerMap(Set<TypeElement> elements) {
     Map<String, Set<TypeElement>> moduleMap = new HashMap<>();
     for (TypeElement element : elements) {
       Worker worker = element.getAnnotation(Worker.class);
       String module = worker.module();
+
+      moduleSet.add(module);
 
       Set<TypeElement> elementSet = moduleMap.get(module);
       if (elementSet == null) {
@@ -69,6 +87,7 @@ public class WorkerProcessor extends AbstractProcessor {
       Set<TypeElement> elementSet = item.getValue();
       genFactoryClass(elementSet, module);
     }
+
   }
 
 
@@ -77,8 +96,9 @@ public class WorkerProcessor extends AbstractProcessor {
     ParameterizedTypeName mapTypeName = ParameterizedTypeName.get(
             ClassName.get(Map.class), ClassName.get(String.class),
             ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)));
+
     ParameterSpec mapParameterSpec = ParameterSpec.builder(mapTypeName, paramName).build();
-    MethodSpec.Builder methodInit = MethodSpec.methodBuilder(Constant.FACTORY_METHOD_PARAM_NAME)
+    MethodSpec.Builder methodInit = MethodSpec.methodBuilder(Constant.FACTORY_METHOD)
             .addAnnotation(Override.class)
             .addModifiers(Modifier.PUBLIC)
             .addParameter(mapParameterSpec);
@@ -101,7 +121,49 @@ public class WorkerProcessor extends AbstractProcessor {
     }
   }
 
-  private String capitalize(CharSequence self) {
+
+  /**
+   * Delegate static code block
+   */
+  private static class AptClassVisitor extends ClassVisitor {
+    AptClassVisitor(ClassVisitor cv) {
+      super(Opcodes.ASM5, cv);
+    }
+
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+      MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
+      mLogger.error(name);
+      if (name.equals("<add>")) {
+        mv = new ClinitMethodVisitor(mv, name);
+      }
+      return mv;
+    }
+  }
+
+
+  private static class ClinitMethodVisitor extends MethodVisitor {
+    String owner;
+
+    ClinitMethodVisitor(MethodVisitor mv, String owner) {
+      super(Opcodes.ASM5, mv);
+      this.owner = owner;
+    }
+
+    @Override
+    public void visitIntInsn(int i, int i1) {
+      super.visitIntInsn(i, i1);
+      mv.visitCode();
+      mv.visitFieldInsn(Opcodes.GETSTATIC, owner, "timer", "J");
+      mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/System", "currentTimeMillis", "()J", false);
+      mv.visitInsn(Opcodes.LSUB);
+      mv.visitFieldInsn(Opcodes.PUTSTATIC, owner, "timer", "J");
+    }
+  }
+
+
+
+    private String capitalize(CharSequence self) {
     return self.length() == 0 ? "" :
             "" + Character.toUpperCase(self.charAt(0)) + self.subSequence(1, self.length());
   }
