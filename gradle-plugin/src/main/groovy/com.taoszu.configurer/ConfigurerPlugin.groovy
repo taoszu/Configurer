@@ -10,8 +10,7 @@ import org.gradle.api.plugins.ExtraPropertiesExtension
 
 class ConfigurerPlugin implements Plugin<Project> {
 
-    String DEFAULT_ROUTER_RUNTIME_VERSION = "1.0.0"
-    String DEFAULT_ROUTER_COMPILER_VERSION = "1.0.0"
+    String DEFAULT_PROCESSOR_VERSION = "1.0.0"
 
     @Override
     void apply(Project project) {
@@ -33,6 +32,7 @@ class ConfigurerPlugin implements Plugin<Project> {
             }
         }
 
+        String compileConf = 'compile'
 
         String aptConf = 'annotationProcessor'
         if (isKotlinProject) {
@@ -40,17 +40,15 @@ class ConfigurerPlugin implements Plugin<Project> {
         }
 
         Project processorProject = project.rootProject.findProject("processor")
-        if (processorProject) { // local
+        if (processorProject) {
             project.dependencies.add(aptConf, processorProject)
         } else {
             ExtraPropertiesExtension ext = project.rootProject.ext
-            if (ext.has("routerVersion")) {
-                DEFAULT_ROUTER_RUNTIME_VERSION = ext.get("routerVersion")
+            if (ext.has("processorVersion")) {
+                DEFAULT_PROCESSOR_VERSION = ext.get("processorVersion")
             }
-            if (ext.has("compilerVersion")) {
-                DEFAULT_ROUTER_COMPILER_VERSION = ext.get("compilerVersion")
-            }
-            project.dependencies.add(aptConf, "com.taoszu.configurer:processor:${DEFAULT_ROUTER_COMPILER_VERSION}")
+            project.dependencies.add(compileConf, "com.taoszu.configurer:processor:${DEFAULT_PROCESSOR_VERSION}")
+            project.dependencies.add(aptConf, "com.taoszu.configurer:processor:${DEFAULT_PROCESSOR_VERSION}")
         }
 
         def android = project.extensions.findByName("android")
