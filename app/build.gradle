@@ -36,5 +36,4 @@ dependencies {
 dependencies {
     implementation project(":processor")
     annotationProcessor project(":processor")
-    implementation 'org.ow2.asm:asm:5.1'
 }

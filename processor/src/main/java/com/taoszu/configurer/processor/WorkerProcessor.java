@@ -86,13 +86,7 @@ public class WorkerProcessor extends AbstractProcessor {
 
   private void genFactoryClass(Set<TypeElement> elementSet, String module) {
     String paramName = Constant.FACTORY_METHOD_PARAM_NAME;
-    ParameterizedTypeName mapTypeName = ParameterizedTypeName.get(
-            ClassName.get(Map.class), ClassName.get(String.class),
-            ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(Object.class)));
-
     String className = capitalize(module) + Constant.FACTORY_SUFFIX;
-
-    ParameterSpec mapParameterSpec = ParameterSpec.builder(mapTypeName, paramName).build();
     MethodSpec.Builder methodInit = MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PUBLIC);
 
