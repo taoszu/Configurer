@@ -1,13 +1,19 @@
 apply plugin: 'java-library'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.novoda.bintray-release'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.squareup:javapoet:1.9.0'
 }
 
-group='com.github.taoszu'
-
+publish {
+    userOrg = 'taoszu'
+    groupId = 'com.taoszu.configurer'
+    artifactId = 'processor'
+    publishVersion = '1.0.0'
+    desc = 'Configurer'//描述，不重要
+    website = 'https://github.com/taoszu/Configurer'//网站，不重要；尽量模拟github上的地址，例如我这样的；当然你有地址最好了
+}
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
