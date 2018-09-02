@@ -9,24 +9,22 @@
     ```gradle
     buildscript {
       repositories {
-        maven { url 'https://www.jitpack.io' }
         maven {url 'https://dl.bintray.com/taoszu/maven'}
       }
     }
     
     allprojects {
         repositories {
-              maven { url 'https://www.jitpack.io' }
               maven {url 'https://dl.bintray.com/taoszu/maven'}
         }
     }
     ```
 
-2. Add annotationProcessor to project's `build.gradle`:
+2. Add classpath to root  `build.gradle`:
 
     ```gradle
     dependencies {
-        annotationProcessor "com.taoszu.configurer:processor:1.0.0"
+       classpath "com.taoszu.configurer:plugin:1.0.1"
     }
     ```
     
