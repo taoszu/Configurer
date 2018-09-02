@@ -9,13 +9,13 @@
     ```gradle
     buildscript {
       repositories {
-        maven {url 'https://dl.bintray.com/taoszu/maven'}
+         jcenter()
       }
     }
     
     allprojects {
         repositories {
-              maven {url 'https://dl.bintray.com/taoszu/maven'}
+            jcenter()
         }
     }
     ```
