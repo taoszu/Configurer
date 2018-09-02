@@ -24,7 +24,6 @@ class ConfigurerPlugin implements Plugin<Project> {
             throw new GradleException("require android plugin")
         }
 
-
         def isKotlinProject = project.plugins.hasPlugin('kotlin-android')
         if (isKotlinProject) {
             if (!project.plugins.hasPlugin('kotlin-kapt')) {
@@ -33,22 +32,22 @@ class ConfigurerPlugin implements Plugin<Project> {
         }
 
         String compileConf = 'compile'
-
         String aptConf = 'annotationProcessor'
-        if (isKotlinProject) {
-            aptConf = 'kapt'
-        }
-
+        String kaptConf = 'kapt'
         Project processorProject = project.rootProject.findProject("processor")
         if (processorProject) {
+            project.dependencies.add(compileConf, processorProject)
             project.dependencies.add(aptConf, processorProject)
-        } else {
-            ExtraPropertiesExtension ext = project.rootProject.ext
-            if (ext.has("processorVersion")) {
-                DEFAULT_PROCESSOR_VERSION = ext.get("processorVersion")
+            if (isKotlinProject) {
+                project.dependencies.add(kaptConf, processorProject)
             }
+
+        } else {
             project.dependencies.add(compileConf, "com.taoszu.configurer:processor:${DEFAULT_PROCESSOR_VERSION}")
             project.dependencies.add(aptConf, "com.taoszu.configurer:processor:${DEFAULT_PROCESSOR_VERSION}")
+            if (isKotlinProject) {
+                project.dependencies.add(kaptConf, "com.taoszu.configurer:processor:${DEFAULT_PROCESSOR_VERSION}")
+            }
         }
 
         def android = project.extensions.findByName("android")
