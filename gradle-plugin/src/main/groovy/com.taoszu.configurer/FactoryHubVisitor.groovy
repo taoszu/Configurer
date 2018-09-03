@@ -2,7 +2,7 @@ package com.taoszu.configurer
 
 import org.objectweb.asm.*
 
-class FactoryHubVisitory {
+class FactoryHubVisitor {
 
 
     static byte[] injectClass(InputStream inputStream) {

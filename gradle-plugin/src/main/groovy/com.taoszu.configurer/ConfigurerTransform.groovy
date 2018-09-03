@@ -111,7 +111,7 @@ class ConfigurerTransform extends Transform {
 
                     jarFile.getInputStream(jarEntry).withCloseable { is ->
                         if (entryName == PluginConstant.HUB_CLASS) {
-                            def bytes = FactoryHubVisitory.injectClass(is)
+                            def bytes = FactoryHubVisitor.injectClass(is)
                             jarOutputStream.write(bytes)
                         } else {
                             jarOutputStream.write(IOUtils.toByteArray(is))
