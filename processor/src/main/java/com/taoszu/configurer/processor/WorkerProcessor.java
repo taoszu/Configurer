@@ -3,12 +3,8 @@ package com.taoszu.configurer.processor;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.WildcardTypeName;
 import com.taoszu.configurer.Constant;
-import com.taoszu.configurer.Logger;
 import com.taoszu.configurer.annotation.Worker;
 
 import java.io.IOException;
@@ -31,14 +27,9 @@ import javax.lang.model.element.TypeElement;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class WorkerProcessor extends AbstractProcessor {
 
-  private static Logger mLogger;
-
-
   @Override
   public synchronized void init(ProcessingEnvironment processingEnvironment) {
     super.init(processingEnvironment);
-
-    mLogger = new Logger(processingEnvironment.getMessager());
   }
 
   @Override
@@ -56,16 +47,11 @@ public class WorkerProcessor extends AbstractProcessor {
     return true;
   }
 
-
-  private Set<String> moduleSet = new HashSet<>();
-
   private void genWorkerMap(Set<TypeElement> elements) {
     Map<String, Set<TypeElement>> moduleMap = new HashMap<>();
     for (TypeElement element : elements) {
       Worker worker = element.getAnnotation(Worker.class);
       String module = worker.module();
-
-      moduleSet.add(module);
 
       Set<TypeElement> elementSet = moduleMap.get(module);
       if (elementSet == null) {
@@ -110,8 +96,7 @@ public class WorkerProcessor extends AbstractProcessor {
 
 
     private String capitalize(CharSequence self) {
-    return self.length() == 0 ? "" :
-            "" + Character.toUpperCase(self.charAt(0)) + self.subSequence(1, self.length());
+    return self.length() == 0 ? "" : "" + Character.toUpperCase(self.charAt(0)) + self.subSequence(1, self.length());
   }
 
 }
