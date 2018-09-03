@@ -36,7 +36,6 @@ class FactoryHubVisitor {
         }
     }
 
-
     private static class FactoryHubMethodVisitor extends MethodVisitor {
         FactoryHubMethodVisitor(MethodVisitor mv) {
             super(Opcodes.ASM5, mv)
@@ -50,7 +49,10 @@ class FactoryHubVisitor {
 
                 mv.visitFieldInsn(Opcodes.GETSTATIC, PluginConstant.HUB_CLASS_NAME, "factoryMap", "Ljava/util/Map;")
                 mv.visitLdcInsn(module)
-                mv.visitLdcInsn(className.replaceAll("/", "."))
+                mv.visitTypeInsn(Opcodes.NEW, className)
+                mv.visitInsn(Opcodes.DUP)
+                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, className, "<init>", "()V", false)
+
                 mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true)
             }
 

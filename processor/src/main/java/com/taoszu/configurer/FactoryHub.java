@@ -6,14 +6,14 @@ import java.util.Map;
 public class FactoryHub {
 
 
-  static final Map<String, String> factoryMap = new HashMap<>();
+  static final Map<String, BaseFactory> factoryMap = new HashMap<>();
 
   public static void load() {
 
   }
 
-  public static BaseFactory getFactoryInstance(String key) throws Exception {
-    return (BaseFactory) Class.forName(factoryMap.get(key)).newInstance();
+  public static BaseFactory getFactoryInstance(String key) {
+    return factoryMap.get(key);
   }
 
 
