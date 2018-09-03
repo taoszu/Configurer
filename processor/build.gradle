@@ -10,7 +10,7 @@ publish {
     userOrg = 'taoszu'
     groupId = 'com.taoszu.configurer'
     artifactId = 'processor'
-    publishVersion = '1.0.1'
+    publishVersion = '1.0.2'
     desc = 'Configurer'
     website = 'https://github.com/taoszu/Configurer'
     autoPublish = true

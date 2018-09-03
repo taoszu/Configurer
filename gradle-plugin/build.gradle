@@ -19,7 +19,7 @@ publish {
     userOrg = 'taoszu'
     groupId = 'com.taoszu.configurer'
     artifactId = 'plugin'
-    publishVersion = '1.0.1'
+    publishVersion = '1.0.2'
     desc = 'Configurer plugin'
     website = 'https://github.com/taoszu/Configurer'
     autoPublish = true

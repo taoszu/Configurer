@@ -24,7 +24,7 @@
 
     ```gradle
     dependencies {
-       classpath "com.taoszu.configurer:plugin:1.0.1"
+       classpath "com.taoszu.configurer:plugin:1.0.2"
     }
     ```
     
