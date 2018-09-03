@@ -9,15 +9,11 @@ import org.objectweb.asm.Opcodes
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
-class Scanner {
+class ScanHandler {
 
+    static final Map<String, String> factoryClassMap = new HashMap<>()
 
-    static final String HUB_CLASS = "com/taoszu/configurer/FactoryHub.class"
-
-
-    static final Map<String, String> classNameMap = new HashMap<>()
-
-    private static final String APT_CLASS_PACKAGE_NAME = "com/taoszu/configurer/apt/"
+    static File factoryHubFile
 
     private static
     final Set<String> excludeJar = ["com.android.support", "android.arch.", "androidx."]
@@ -31,11 +27,11 @@ class Scanner {
     }
 
     static boolean shouldScanClass(File classFile) {
-        return classFile.absolutePath.replaceAll("\\\\", "/").contains(APT_CLASS_PACKAGE_NAME)
+        return classFile.absolutePath.replaceAll("\\\\", "/").contains(PluginConstant.APT_CLASS_PACKAGE)
     }
 
     /**
-     * 扫描jar包
+     * 扫描jar包找出FactoryHub
      */
     static void scanJar(File src, File dest) {
         if (src && src.exists()) {
@@ -44,13 +40,9 @@ class Scanner {
             while (enumeration.hasMoreElements()) {
                 JarEntry jarEntry = (JarEntry) enumeration.nextElement()
                 String entryName = jarEntry.getName()
-                if (entryName == HUB_CLASS) {
-                    // mark
-                    ConfigurerTransform.registerTargetFile = dest
-                } else if (entryName.startsWith(APT_CLASS_PACKAGE_NAME)) {
-                    InputStream inputStream = jar.getInputStream(jarEntry)
-                    scanClass(inputStream)
-                    inputStream.close()
+                if (entryName == PluginConstant.HUB_CLASS) {
+                    factoryHubFile = dest
+                    break
                 }
             }
             jar.close()
@@ -58,33 +50,28 @@ class Scanner {
     }
 
     static void scanClass(File classFile) {
-        scanClass(new FileInputStream(classFile))
-    }
-
-    /**
-     * 扫描class
-     */
-    static void scanClass(InputStream is) {
+        InputStream is = new FileInputStream(classFile)
         is.withCloseable {
             ClassReader cr = new ClassReader(is)
-            ScanClassVisitor cv = new ScanClassVisitor()
+            FactoryClassVisitor cv = new FactoryClassVisitor()
             cr.accept(cv, 0)
         }
     }
 
-    static class ScanClassVisitor extends ClassVisitor {
-        ScanClassVisitor() {
+
+    static class FactoryClassVisitor extends ClassVisitor {
+        FactoryClassVisitor() {
             super(Opcodes.ASM5)
         }
 
         @Override
         void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
             super.visit(version, access, name, signature, superName, interfaces)
-            classNameMap.put(capitalize(name), name)
+            factoryClassMap.put(genFactoryKey(name), name)
         }
 
-        String capitalize(String className) {
-            String moduleName = className.replaceAll("Factory", "").replaceAll(APT_CLASS_PACKAGE_NAME, "")
+        private String genFactoryKey(String className) {
+            String moduleName = className.replaceAll("Factory", "").replaceAll(PluginConstant.APT_CLASS_PACKAGE, "")
             return moduleName.toLowerCase()
         }
     }

@@ -4,7 +4,13 @@ import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 import org.gradle.api.Project
+
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
+import java.util.jar.JarOutputStream
+import java.util.zip.ZipEntry
 
 class ConfigurerTransform extends Transform {
 
@@ -45,11 +51,12 @@ class ConfigurerTransform extends Transform {
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
 
+        /**
+         * 扫描jar包找出FactoryHub
+         */
         transformInvocation.inputs.each { TransformInput input ->
             if (!input.jarInputs.empty) {
-
                 input.jarInputs.each { JarInput jarInput ->
-
                     String destName = jarInput.name
                     String hexName = DigestUtils.md5Hex(jarInput.file.absolutePath)
 
@@ -58,36 +65,66 @@ class ConfigurerTransform extends Transform {
                     }
                     File destFile = transformInvocation.outputProvider.getContentLocation(
                             destName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
-                    if (Scanner.shouldScanJar(jarInput)) {
-                        Scanner.scanJar(jarInput.file, destFile)
+                    if (ScanHandler.shouldScanJar(jarInput)) {
+                        ScanHandler.scanJar(jarInput.file, destFile)
                     }
-
                     FileUtils.copyFile(jarInput.file, destFile)
                 }
             }
 
+            /**
+             * 扫描文件夹找出动态生成的工厂类
+             */
             if (!input.directoryInputs.empty) {
-
                 input.directoryInputs.each { DirectoryInput directoryInput ->
-
                     File dest = transformInvocation.outputProvider.getContentLocation(
                             directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY)
 
                     directoryInput.file.eachFileRecurse { File file ->
-                        if (file.isFile() && Scanner.shouldScanClass(file)) {
-                            project.logger.error("scan " + file.name)
-                            Scanner.scanClass(file)
+                        if (file.isFile() && ScanHandler.shouldScanClass(file)) {
+                            ScanHandler.scanClass(file)
                         }
                     }
-
                     FileUtils.copyDirectory(directoryInput.file, dest)
                 }
             }
         }
 
+        /**
+         * 找出FactoryHub之后 修改类的代码 然后删除旧文件 打包新的文件替换
+         */
+        File targetFile = ScanHandler.factoryHubFile
+        if (targetFile) {
+            if (targetFile.name.endsWith(".jar")) {
+                def optJar = new File(targetFile.getParent(), targetFile.name + ".opt")
+                if (optJar.exists()) optJar.delete()
+                def jarFile = new JarFile(targetFile)
+                JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(optJar))
+                Enumeration enumeration = jarFile.entries()
 
-        if (registerTargetFile) {
-            ConfigurerInject.inject(registerTargetFile, project)
+
+                while (enumeration.hasMoreElements()) {
+                    JarEntry jarEntry = enumeration.nextElement()
+                    String entryName = jarEntry.name
+                    ZipEntry zipEntry = new ZipEntry(entryName)
+                    jarOutputStream.putNextEntry(zipEntry)
+
+                    jarFile.getInputStream(jarEntry).withCloseable { is ->
+                        if (entryName == PluginConstant.HUB_CLASS) {
+                            def bytes = FactoryHubVisitory.injectClass(is)
+                            jarOutputStream.write(bytes)
+                        } else {
+                            jarOutputStream.write(IOUtils.toByteArray(is))
+                        }
+                        jarOutputStream.closeEntry()
+                    }
+                }
+                jarOutputStream.close()
+                jarFile.close()
+
+                targetFile.delete()
+                optJar.renameTo(targetFile)
+            }
         }
 
     }
