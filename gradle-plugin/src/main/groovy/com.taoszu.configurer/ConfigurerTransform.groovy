@@ -14,8 +14,6 @@ import java.util.zip.ZipEntry
 
 class ConfigurerTransform extends Transform {
 
-    static File registerTargetFile = null
-
     Project project
 
     ConfigurerTransform(Project project) {
@@ -39,18 +37,16 @@ class ConfigurerTransform extends Transform {
 
     @Override
     Set<? super QualifiedContent.Scope> getScopes() {
-        return TransformManager.SCOPE_FULL_PROJECT
+        return TransformManager.PROJECT_ONLY
     }
 
     @Override
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
-        super.transform(context, inputs, referencedInputs, outputProvider, isIncremental)
+
     }
 
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-        super.transform(transformInvocation)
-
         /**
          * 扫描jar包找出FactoryHub
          */
