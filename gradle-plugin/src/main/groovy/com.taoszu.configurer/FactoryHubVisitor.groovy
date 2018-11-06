@@ -1,9 +1,11 @@
 package com.taoszu.configurer
 
+import org.gradle.api.Project
 import org.objectweb.asm.*
 
 class FactoryHubVisitor {
 
+    static Project project
 
     static byte[] injectClass(InputStream inputStream) {
         inputStream.withCloseable { is ->
@@ -44,6 +46,7 @@ class FactoryHubVisitor {
         @Override
         void visitCode() {
             ScanHandler.factoryClassMap.each { record ->
+
                 String module = record.getKey()
                 String className = record.getValue()
 

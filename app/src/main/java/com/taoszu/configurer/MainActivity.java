@@ -4,7 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.taoszu.configurer.apt.StudentFactory;
 
 public class MainActivity extends AppCompatActivity {
   @Override
@@ -13,10 +14,12 @@ public class MainActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_main);
 
+
     FactoryHub.load();
-    BaseFactory teacherFactory = FactoryHub.getFactoryInstance("teacher");
- /*   for (Class worker : teacherFactory.workerMap.values()) {
-      Toast.makeText(this, worker.getName(), Toast.LENGTH_LONG).show();
+    Log.e("Factory", FactoryHub.factoryMap.toString());
+    StudentFactory studentFactory = (StudentFactory) FactoryHub.getFactoryInstance("student");
+   /* for (BaseStudent worker : studentFactory.workerMap.values()) {
+      worker.printName();
     }*/
 
 

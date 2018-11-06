@@ -37,7 +37,7 @@ class ConfigurerTransform extends Transform {
 
     @Override
     Set<? super QualifiedContent.Scope> getScopes() {
-        return TransformManager.PROJECT_ONLY
+        return TransformManager.SCOPE_FULL_PROJECT
     }
 
     @Override
@@ -47,6 +47,9 @@ class ConfigurerTransform extends Transform {
 
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
+        FactoryHubVisitor.project = project
+        ScanHandler.project = project
+
         /**
          * 扫描jar包找出FactoryHub
          */

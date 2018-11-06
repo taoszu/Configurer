@@ -2,6 +2,7 @@ package com.taoszu.configurer
 
 
 import com.android.build.api.transform.JarInput
+import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
@@ -10,6 +11,8 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
 class ScanHandler {
+
+    static Project project
 
     static final Map<String, String> factoryClassMap = new HashMap<>()
 
