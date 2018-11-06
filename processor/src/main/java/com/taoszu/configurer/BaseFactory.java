@@ -3,11 +3,11 @@ package com.taoszu.configurer;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BaseFactory {
+public abstract class BaseFactory<T> {
 
-  public Map<String, Class<?>> workerMap = new HashMap<>();
+  public Map<String, T> workerMap = new HashMap<>();
 
-  public Class<?> getWorker(String key) {
+  public T getWorker(String key) {
     return workerMap.get(key);
   }
 

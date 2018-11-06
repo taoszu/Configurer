@@ -4,6 +4,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import com.taoszu.configurer.BaseFactory;
 import com.taoszu.configurer.Constant;
 import com.taoszu.configurer.annotation.Worker;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -22,6 +24,9 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 
 @SupportedAnnotationTypes("com.taoszu.configurer.annotation.Worker")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -48,15 +53,36 @@ public class WorkerProcessor extends AbstractProcessor {
   }
 
   private void genWorkerMap(Set<TypeElement> elements) {
+    Map<String, String> moduleClassMap = new HashMap<>();
+
     Map<String, Set<TypeElement>> moduleMap = new HashMap<>();
     for (TypeElement element : elements) {
       Worker worker = element.getAnnotation(Worker.class);
       String module = worker.module();
 
+
       Set<TypeElement> elementSet = moduleMap.get(module);
       if (elementSet == null) {
         elementSet = new HashSet<>();
         moduleMap.put(module, elementSet);
+      }
+
+      try {
+        worker.baseClass();
+
+      } catch (MirroredTypeException mirroredTypeException) {
+        DeclaredType classTypeMirror = (DeclaredType) mirroredTypeException.getTypeMirror();
+        TypeElement classTypeElement = (TypeElement) classTypeMirror.asElement();
+        String baseClassName = classTypeElement.getQualifiedName().toString();
+
+        if (moduleClassMap.containsKey(module)) {
+          String className = moduleClassMap.get(module);
+          if (!className.equals(baseClassName)) {
+            throw new IllegalStateException("module " + module + " base class" + " should be the same");
+          }
+        }
+
+        moduleClassMap.put(module, baseClassName);
       }
       elementSet.add(element);
     }
@@ -82,6 +108,9 @@ public class WorkerProcessor extends AbstractProcessor {
       methodInit.addStatement(paramName + ".put($S, $T.class)", worker.key(), ClassName.get(element));
     }
 
+    /**
+     * 构建生成类的构造器
+     */
     TypeSpec type = TypeSpec.classBuilder(className)
             .superclass(ClassName.bestGuess(Constant.FACTORY_INTERFACE))
             .addModifiers(Modifier.PUBLIC)

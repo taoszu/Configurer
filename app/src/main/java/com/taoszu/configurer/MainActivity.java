@@ -15,9 +15,9 @@ public class MainActivity extends AppCompatActivity {
 
     FactoryHub.load();
     BaseFactory teacherFactory = FactoryHub.getFactoryInstance("teacher");
-    for (Class worker : teacherFactory.workerMap.values()) {
+ /*   for (Class worker : teacherFactory.workerMap.values()) {
       Toast.makeText(this, worker.getName(), Toast.LENGTH_LONG).show();
-    }
+    }*/
 
 
   }
