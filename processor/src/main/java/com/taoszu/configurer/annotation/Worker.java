@@ -13,6 +13,6 @@ public @interface Worker {
 
   String module();
 
-  Class<?> baseClass() default Class.class;
+  Class<?> baseClass();
 
 }

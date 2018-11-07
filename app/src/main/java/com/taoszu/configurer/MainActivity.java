@@ -5,8 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.taoszu.configurer.apt.StudentFactory;
-
 public class MainActivity extends AppCompatActivity {
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -17,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     FactoryHub.load();
     Log.e("Factory", FactoryHub.factoryMap.toString());
-    StudentFactory studentFactory = (StudentFactory) FactoryHub.getFactoryInstance("student");
+    //StudentFactory studentFactory = (StudentFactory) FactoryHub.getFactoryInstance("student");
    /* for (BaseStudent worker : studentFactory.workerMap.values()) {
       worker.printName();
     }*/

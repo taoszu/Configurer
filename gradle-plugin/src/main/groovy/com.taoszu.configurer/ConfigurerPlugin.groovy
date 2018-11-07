@@ -50,9 +50,14 @@ class ConfigurerPlugin implements Plugin<Project> {
             }
         }
 
-        def android = project.extensions.findByName("android")
-        def transform = new ConfigurerTransform(project)
-        android.registerTransform(transform)
+        /**
+         * 可以避免在library引用的时候报错
+         */
+        if (project.plugins.hasPlugin(AppPlugin)) {
+            def android = project.extensions.findByName("android")
+            def transform = new ConfigurerTransform(project)
+            android.registerTransform(transform)
+        }
     }
 
 }

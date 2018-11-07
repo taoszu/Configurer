@@ -6,8 +6,7 @@ dependencies {
     implementation gradleApi()
     implementation localGroovy()
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.tools.build:gradle:3.1.4'
+    implementation 'com.android.tools.build:gradle:3.2.0'
 }
 
 repositories {
@@ -19,7 +18,7 @@ publish {
     userOrg = 'taoszu'
     groupId = 'com.taoszu.configurer'
     artifactId = 'plugin'
-    publishVersion = '1.0.4'
+    publishVersion = '1.1.0'
     desc = 'Configurer plugin'
     website = 'https://github.com/taoszu/Configurer'
     autoPublish = true
@@ -30,7 +29,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             pom.groupId = 'com.taoszu.configurer'
-            pom.version = '1.0.5'
+            pom.version = '1.0.6'
             pom.artifactId = "plugin"
             repository(url: uri('../repo'))
         }
