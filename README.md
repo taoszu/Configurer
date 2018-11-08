@@ -57,7 +57,7 @@
 
 2. 调用 FactoryHub.load() 初始化
 
-3. 获取Worker的工厂
+3. 获取Worker
     ```java
     ITFactory itFactory = (ITFactory) FactoryHub.getFactoryInstance("IT");
     BaseProgramer androidProgramer = itFactory.getWorker("android");
