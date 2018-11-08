@@ -42,7 +42,7 @@
     }
    ```
    
-1. 在类增加注解Wokrer 
+2. 在类增加注解Wokrer 
    
 
    ```java
@@ -55,9 +55,9 @@
    }
    ```
 
-2. 调用 FactoryHub.load() 初始化
+3. 调用 FactoryHub.load() 初始化
 
-3. 获取Worker
+4. 获取Worker
     ```java
     ITFactory itFactory = (ITFactory) FactoryHub.getFactoryInstance("IT");
     BaseProgramer androidProgramer = itFactory.getWorker("android");
