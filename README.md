@@ -1,5 +1,5 @@
 # Configurer
-通过注解编译时生成关系的配置绑定，无需手动配置
+通过注解在编译时自动生成工厂与生产者关系的配置绑定
 
 
 ## Get Start
@@ -24,7 +24,7 @@
 
     ```gradle
     dependencies {
-       classpath "com.taoszu.configurer:plugin:1.0.2"
+       classpath "com.taoszu.configurer:plugin:1.1.1"
     }
     ```
     
@@ -35,17 +35,31 @@
     ```
     
 ## Use
+1. 定义基础接口类
+  ```java
+    public interface BaseProgramer {
+      void doProgram();
+    }
+   ```
+   
+2. 在类增加注解Wokrer 
+   
 
-1. 在类增加注解Wokrer 
    ```java
-   @Worker(key = "taoszu", module = "Worker")
-   Class Worker {
+   @Worker(key = "android", module = "IT", baseClass = BaseProgramer.class )
+   Class AndroidProgramer implements BaseProgramer {
+         @Override
+         public void doProgram() {
+           Log.e("Programer", "我是安卓程序🐒")
+         }
    }
    ```
 
-2. 调用 FactoryHub.load() 初始化
+3. 调用 FactoryHub.load() 初始化
 
-3. 获取Worker的工厂
+4. 获取Worker
     ```java
-    BaseFactory workerFactory = FactoryHub.getFactoryInstance(module)
+    ITFactory itFactory = (ITFactory) FactoryHub.getFactoryInstance("IT");
+    BaseProgramer androidProgramer = itFactory.getWorker("android");
+    androidProgramer.doProgram()
    ```
