@@ -10,7 +10,7 @@ import org.gradle.api.plugins.ExtraPropertiesExtension
 
 class ConfigurerPlugin implements Plugin<Project> {
 
-    String DEFAULT_PROCESSOR_VERSION = "1.0.2"
+    String DEFAULT_PROCESSOR_VERSION = "1.1.0"
 
     @Override
     void apply(Project project) {
