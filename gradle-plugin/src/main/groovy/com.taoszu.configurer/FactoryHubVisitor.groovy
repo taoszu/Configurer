@@ -50,6 +50,8 @@ class FactoryHubVisitor {
                 String module = record.getKey()
                 String className = record.getValue()
 
+                project.logger.error("module: [ " + module + " ] --> class: [ " + className + " ]")
+
                 mv.visitFieldInsn(Opcodes.GETSTATIC, PluginConstant.HUB_CLASS_NAME, "factoryMap", "Ljava/util/Map;")
                 mv.visitLdcInsn(module)
                 mv.visitTypeInsn(Opcodes.NEW, className)

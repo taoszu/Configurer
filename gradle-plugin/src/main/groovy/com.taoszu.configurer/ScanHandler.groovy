@@ -46,6 +46,10 @@ class ScanHandler {
                 if (entryName == PluginConstant.HUB_CLASS) {
                     factoryHubFile = dest
                     break
+                } else if (entryName.startsWith(PluginConstant.APT_CLASS_PACKAGE)) {
+                    InputStream inputStream = jar.getInputStream(jarEntry)
+                    scanClass(inputStream)
+                    inputStream.close()
                 }
             }
             jar.close()
@@ -54,6 +58,10 @@ class ScanHandler {
 
     static void scanClass(File classFile) {
         InputStream is = new FileInputStream(classFile)
+        scanClass(is)
+    }
+
+    static void scanClass(InputStream is) {
         is.withCloseable {
             ClassReader cr = new ClassReader(is)
             FactoryClassVisitor cv = new FactoryClassVisitor()
@@ -75,7 +83,7 @@ class ScanHandler {
 
         private String genFactoryKey(String className) {
             String moduleName = className.replaceAll("Factory", "").replaceAll(PluginConstant.APT_CLASS_PACKAGE, "")
-            return moduleName.toLowerCase()
+            return moduleName
         }
     }
 

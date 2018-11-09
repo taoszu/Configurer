@@ -4,8 +4,8 @@ import android.util.Log;
 
 import com.taoszu.configurer.annotation.Worker;
 
-@Worker(key = "A", module = "student", baseClass = BaseStudent.class)
-public class AStudent implements BaseStudent {
+@Worker(key = "A", module = "student", baseClass = BaseStudentClass.class)
+public class AStudent extends BaseStudentClass {
 
   @Override
   public void printName() {

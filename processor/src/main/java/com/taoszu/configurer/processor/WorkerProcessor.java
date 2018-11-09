@@ -102,7 +102,7 @@ public class WorkerProcessor extends AbstractProcessor {
 
   private void genFactoryClass(Set<TypeElement> elementSet, String module, String moduleBaseClass) {
     String paramName = Constant.FACTORY_METHOD_PARAM_NAME;
-    String className = capitalize(module) + Constant.FACTORY_SUFFIX;
+    String className = module + Constant.FACTORY_SUFFIX;
 
     ClassName baseClassName = ClassName.bestGuess(moduleBaseClass);
     ClassName baseFactoryClass = ClassName.bestGuess(Constant.FACTORY_INTERFACE);

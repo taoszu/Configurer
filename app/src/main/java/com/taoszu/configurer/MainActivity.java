@@ -3,9 +3,6 @@ package com.taoszu.configurer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-
-import com.taoszu.configurer.apt.StudentFactory;
 
 public class MainActivity extends AppCompatActivity {
   @Override
@@ -16,10 +13,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     FactoryHub.load();
-    StudentFactory studentFactory = (StudentFactory) FactoryHub.getFactoryInstance("student");
-    for (BaseStudent worker : studentFactory.workerMap.values()) {
+    BaseFactory baseFactory = FactoryHub.getFactoryInstance("student");
+    BaseStudentClass baseStudent = (BaseStudentClass) baseFactory.getWorker("A");
+    baseStudent.printName();
+
+
+    /*TeacherFactory studentFactory = (TeacherFactory) FactoryHub.getFactoryInstance("teacher");
+    for (BaseStudentClass worker : studentFactory.workerMap.values()) {
       worker.printName();
-    }
+    }*/
 
 
   }
