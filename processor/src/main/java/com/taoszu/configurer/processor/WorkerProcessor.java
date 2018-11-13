@@ -25,7 +25,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.MirroredTypeException;
 
 @SupportedAnnotationTypes("com.taoszu.configurer.annotation.Worker")
@@ -74,9 +73,7 @@ public class WorkerProcessor extends AbstractProcessor {
       try {
         worker.baseClass();
       } catch (MirroredTypeException mirroredTypeException) {
-        DeclaredType classTypeMirror = (DeclaredType) mirroredTypeException.getTypeMirror();
-        TypeElement classTypeElement = (TypeElement) classTypeMirror.asElement();
-        String baseClassName = classTypeElement.getQualifiedName().toString();
+        String baseClassName = ProcessorTools.getBaseClassName(mirroredTypeException);
 
         /**
          * 检测模块中基类是否相同
@@ -124,7 +121,11 @@ public class WorkerProcessor extends AbstractProcessor {
 
     for (TypeElement element : elementSet) {
       Worker worker = element.getAnnotation(Worker.class);
-      methodInit.addStatement(paramName + ".put($S, new $T())", worker.key(), ClassName.get(element));
+
+      String[] keyList = worker.key();
+      for (String key: keyList) {
+        methodInit.addStatement(paramName + ".put($S, new $T())", key, ClassName.get(element));
+      }
     }
 
     /**
@@ -156,9 +157,5 @@ public class WorkerProcessor extends AbstractProcessor {
     }
   }
 
-
-    private String capitalize(CharSequence self) {
-    return self.length() == 0 ? "" : "" + Character.toUpperCase(self.charAt(0)) + self.subSequence(1, self.length());
-  }
 
 }

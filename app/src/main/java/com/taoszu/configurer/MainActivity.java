@@ -11,11 +11,11 @@ public class MainActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_main);
 
-
     FactoryHub.load();
     BaseFactory baseFactory = FactoryHub.getFactoryInstance("student");
     BaseStudentClass baseStudent = (BaseStudentClass) baseFactory.getWorker("A");
     baseStudent.printName();
+
 
 
     /*TeacherFactory studentFactory = (TeacherFactory) FactoryHub.getFactoryInstance("teacher");
