@@ -9,7 +9,7 @@ import org.gradle.api.Project
 
 class ConfigurerPlugin implements Plugin<Project> {
 
-    String DEFAULT_PROCESSOR_VERSION = "1.1.1"
+    String DEFAULT_PROCESSOR_VERSION = "1.1.2"
 
     @Override
     void apply(Project project) {
