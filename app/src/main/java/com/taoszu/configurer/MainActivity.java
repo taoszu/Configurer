@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.taoszu.configurer.apt.LibStudentFactory;
+import com.taoszu.configurer.apt.studentFactory;
+
 public class MainActivity extends AppCompatActivity {
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -11,18 +14,17 @@ public class MainActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_main);
 
+    FactoryHub.injectFactory("teacher", new TeacherFactory());
     FactoryHub.load();
-    BaseFactory baseFactory = FactoryHub.getFactoryInstance("student");
-    BaseStudentClass baseStudent = (BaseStudentClass) baseFactory.getWorker("A");
+
+
+    TeacherFactory teacherFactory = (TeacherFactory) FactoryHub.getFactoryInstance("teacher");
+    BaseTeacher baseTeacher = teacherFactory.getWorker("tao");
+    baseTeacher.printName();
+
+    studentFactory studentFactory = (studentFactory) FactoryHub.getFactoryInstance("student");
+    BaseStudentClass baseStudent = studentFactory.getWorker("A");
     baseStudent.printName();
-
-
-
-    /*TeacherFactory studentFactory = (TeacherFactory) FactoryHub.getFactoryInstance("teacher");
-    for (BaseStudentClass worker : studentFactory.workerMap.values()) {
-      worker.printName();
-    }*/
-
 
   }
 }
