@@ -5,6 +5,7 @@ import com.android.build.api.transform.JarInput
 import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.FieldVisitor
 import org.objectweb.asm.Opcodes
 
 import java.util.jar.JarEntry
@@ -29,8 +30,12 @@ class ScanHandler {
         return true
     }
 
-    static boolean shouldScanClass(File classFile) {
+    static boolean shouldScanFactoryClass(File classFile) {
         return classFile.absolutePath.replaceAll("\\\\", "/").contains(PluginConstant.APT_CLASS_PACKAGE)
+    }
+
+    static boolean shouldScanTempClass(File classFile) {
+        return classFile.absolutePath.replaceAll("\\\\", "/").contains(PluginConstant.TEMP_CLASS_PACKAGE)
     }
 
     /**
@@ -43,12 +48,17 @@ class ScanHandler {
             while (enumeration.hasMoreElements()) {
                 JarEntry jarEntry = (JarEntry) enumeration.nextElement()
                 String entryName = jarEntry.getName()
+
                 if (entryName == PluginConstant.HUB_CLASS) {
                     factoryHubFile = dest
-                    break
+                } else if(entryName == PluginConstant.FACTORY_TEMP_REPO_CLASS) {
+                    InputStream inputStream = jar.getInputStream(jarEntry)
+                    scanFactoryTempRepoClass(inputStream)
+                    inputStream.close()
+
                 } else if (entryName.startsWith(PluginConstant.APT_CLASS_PACKAGE)) {
                     InputStream inputStream = jar.getInputStream(jarEntry)
-                    scanClass(inputStream)
+                    scanFactoryClass(inputStream)
                     inputStream.close()
                 }
             }
@@ -56,16 +66,46 @@ class ScanHandler {
         }
     }
 
-    static void scanClass(File classFile) {
+    static void scanFactoryClass(File classFile) {
         InputStream is = new FileInputStream(classFile)
-        scanClass(is)
+        scanFactoryClass(is)
     }
 
-    static void scanClass(InputStream is) {
+    static void scanFactoryClass(InputStream is) {
         is.withCloseable {
             ClassReader cr = new ClassReader(is)
             FactoryClassVisitor cv = new FactoryClassVisitor()
             cr.accept(cv, 0)
+        }
+    }
+
+    static void scanFactoryTempRepoClass(File classFile) {
+        InputStream is = new FileInputStream(classFile)
+        scanFactoryTempRepoClass(is)
+    }
+
+    static void scanFactoryTempRepoClass(InputStream is) {
+        is.withCloseable {
+            ClassReader cr = new ClassReader(is)
+            FactoryTempRepoClassVisitor cv = new FactoryTempRepoClassVisitor()
+            cr.accept(cv, 0)
+        }
+    }
+
+    static class FactoryTempRepoClassVisitor extends ClassVisitor {
+        FactoryTempRepoClassVisitor() {
+            super(Opcodes.ASM5)
+        }
+
+        @Override
+        void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+            super.visit(version, access, name, signature, superName, interfaces)
+        }
+
+        @Override
+        FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+            factoryClassMap.put(name, descToClassType(desc))
+            return super.visitField(access, name, desc, signature, value)
         }
     }
 
@@ -87,5 +127,18 @@ class ScanHandler {
         }
     }
 
+    /**
+     * 类型为Lcom/taoszu/configurer/TeacherFactory;
+     * 转为com/taoszu/configurer/TeacherFactory
+     * @param desc
+     * @return
+     */
+    private static String descToClassType(String desc) {
+        String classType
+        if (desc.startsWith("L")) {
+            classType = desc.substring(1)
+        }
+        return classType.replaceAll(";", "")
+    }
 
 }

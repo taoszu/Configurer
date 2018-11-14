@@ -12,4 +12,8 @@ public interface Constant {
 
 
 
+  String FACTORY_TEMP_REPO = "FactoryTempRepo";
+
+  String FACTORY_TEMP_DIR = "com.taoszu.configurer.temp";
+
 }

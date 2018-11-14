@@ -80,9 +80,14 @@ class ConfigurerTransform extends Transform {
                             directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY)
 
                     directoryInput.file.eachFileRecurse { File file ->
-                        if (file.isFile() && ScanHandler.shouldScanClass(file)) {
-                            ScanHandler.scanClass(file)
+                        if (file.isFile()) {
+                            if (ScanHandler.shouldScanFactoryClass(file)) {
+                                ScanHandler.scanFactoryClass(file)
+                            } else if (ScanHandler.shouldScanTempClass(file)) {
+                                ScanHandler.scanFactoryTempRepoClass(file)
+                            }
                         }
+
                     }
                     FileUtils.copyDirectory(directoryInput.file, dest)
                 }

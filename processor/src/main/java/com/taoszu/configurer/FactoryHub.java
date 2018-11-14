@@ -15,9 +15,6 @@ public class FactoryHub {
     return factoryMap.get(key);
   }
 
-  public static void injectFactory(String factoryKey, BaseFactory factory) {
-    factoryMap.put(factoryKey, factory);
-  }
 
   public static void clear() {
     factoryMap.clear();

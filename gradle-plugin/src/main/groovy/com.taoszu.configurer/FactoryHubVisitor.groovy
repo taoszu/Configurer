@@ -45,6 +45,7 @@ class FactoryHubVisitor {
 
         @Override
         void visitCode() {
+
             ScanHandler.factoryClassMap.each { record ->
 
                 String module = record.getKey()
@@ -60,7 +61,6 @@ class FactoryHubVisitor {
 
                 mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true)
             }
-
             super.visitCode()
         }
 

@@ -17,7 +17,7 @@ buildscript {
         classpath 'com.novoda:bintray-release:0.4.0'
 
         if (Boolean.valueOf(applyConfigurerPlugin)) {
-            classpath 'com.taoszu.configurer:plugin:1.1.5'
+            classpath 'com.taoszu.configurer:plugin:1.1.6'
         }
 
         // NOTE: Do not place your application dependencies here; they belong

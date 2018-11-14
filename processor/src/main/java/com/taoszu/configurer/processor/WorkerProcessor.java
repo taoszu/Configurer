@@ -26,6 +26,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
+import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes("com.taoszu.configurer.annotation.Worker")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -44,6 +45,7 @@ public class WorkerProcessor extends AbstractProcessor {
     }
     Set<TypeElement> typeElements = new HashSet<>();
     for (Element element : elements) {
+      System.out.println(element.getSimpleName());
       typeElements.add((TypeElement) element);
     }
     genWorkerMap(typeElements);

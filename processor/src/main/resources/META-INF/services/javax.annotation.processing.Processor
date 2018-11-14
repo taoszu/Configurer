@@ -1,1 +1,2 @@
 com.taoszu.configurer.processor.WorkerProcessor
+com.taoszu.configurer.processor.FactoryProcessor
