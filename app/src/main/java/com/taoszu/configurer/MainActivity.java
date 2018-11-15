@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     FactoryHub.load();
 
-    TeacherFactory teacherFactory1 = (TeacherFactory) FactoryHub.getFactoryInstance("teacherA");
+    TeacherFactory teacherFactory1 = (TeacherFactory) FactoryHub.getFactoryInstance("teache");
     BaseTeacher baseTeacher1 = teacherFactory1.getWorker("tao");
     baseTeacher1.printName();
   }

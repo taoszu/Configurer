@@ -7,7 +7,7 @@ import com.taoszu.configurer.annotation.Factory;
 import java.util.HashMap;
 import java.util.Map;
 
-@Factory(module = "teacherA")
+@Factory(module = "teache")
 public class TeacherFactory implements BaseFactory<BaseTeacher> {
 
   Map<String, BaseTeacher> baseTeacherMap = new HashMap<>();

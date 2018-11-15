@@ -20,6 +20,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes("com.taoszu.configurer.annotation.Factory")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -40,6 +41,7 @@ public class FactoryProcessor extends AbstractProcessor {
     if (elements == null || elements.isEmpty()) {
       return true;
     }
+    //processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, elements.size() + " " + moduleName);
 
     Set<TypeElement> typeElements = new HashSet<>();
     for (Element element : elements) {
