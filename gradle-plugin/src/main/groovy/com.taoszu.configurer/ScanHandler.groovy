@@ -2,6 +2,7 @@ package com.taoszu.configurer
 
 
 import com.android.build.api.transform.JarInput
+import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
@@ -51,7 +52,7 @@ class ScanHandler {
 
                 if (entryName == PluginConstant.HUB_CLASS) {
                     factoryHubFile = dest
-                } else if(entryName == PluginConstant.FACTORY_TEMP_REPO_CLASS) {
+                } else if(entryName.startsWith(PluginConstant.TEMP_CLASS_PACKAGE)) {
                     InputStream inputStream = jar.getInputStream(jarEntry)
                     scanFactoryTempRepoClass(inputStream)
                     inputStream.close()

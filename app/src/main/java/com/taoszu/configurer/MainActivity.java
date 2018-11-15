@@ -4,8 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.taoszu.configurer.apt.LibStudentFactory;
-import com.taoszu.configurer.apt.studentFactory;
+
 
 public class MainActivity extends AppCompatActivity {
   @Override
@@ -14,17 +13,12 @@ public class MainActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_main);
 
-    FactoryHub.injectFactory("teacher", new TeacherFactory());
     FactoryHub.load();
 
-
-    TeacherFactory teacherFactory = (TeacherFactory) FactoryHub.getFactoryInstance("teacher");
-    BaseTeacher baseTeacher = teacherFactory.getWorker("tao");
-    baseTeacher.printName();
-
-    studentFactory studentFactory = (studentFactory) FactoryHub.getFactoryInstance("student");
-    BaseStudentClass baseStudent = studentFactory.getWorker("A");
-    baseStudent.printName();
-
+    TeacherFactory teacherFactory1 = (TeacherFactory) FactoryHub.getFactoryInstance("teacherA");
+    BaseTeacher baseTeacher1 = teacherFactory1.getWorker("tao");
+    baseTeacher1.printName();
   }
+
+
 }

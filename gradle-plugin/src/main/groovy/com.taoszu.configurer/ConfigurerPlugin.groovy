@@ -9,7 +9,7 @@ import org.gradle.api.Project
 
 class ConfigurerPlugin implements Plugin<Project> {
 
-    String DEFAULT_PROCESSOR_VERSION = "1.1.4"
+    String DEFAULT_PROCESSOR_VERSION = "1.1.5"
 
     @Override
     void apply(Project project) {
@@ -50,10 +50,20 @@ class ConfigurerPlugin implements Plugin<Project> {
         }
 
         /**
+         * 传递模块名字到注解处理器
+         */
+        def android = project.extensions.findByName("android")
+        if (android) {
+            android.defaultConfig.javaCompileOptions.annotationProcessorOptions.argument(PluginConstant.MODULE_NAME, project.name)
+            android.productFlavors.all {
+                it.javaCompileOptions.annotationProcessorOptions.argument(PluginConstant.MODULE_NAME, project.name)
+            }
+        }
+
+        /**
          * 可以避免在library引用的时候报错
          */
         if (project.plugins.hasPlugin(AppPlugin)) {
-            def android = project.extensions.findByName("android")
             def transform = new ConfigurerTransform(project)
             android.registerTransform(transform)
         }
