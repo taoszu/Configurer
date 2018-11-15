@@ -56,7 +56,7 @@ public class FactoryProcessor extends AbstractProcessor {
    * @param typeElements
    */
   private void genFactoryTempRepo(Set<TypeElement> typeElements) {
-    String moduleFactoryRepoName = moduleName + Constant.FACTORY_TEMP_REPO_SUFFIX;
+    String moduleFactoryRepoName =  Constant.FACTORY_TEMP_REPO_PREFIX + moduleName;
     TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(moduleFactoryRepoName).addModifiers(Modifier.PUBLIC);
 
     for (TypeElement element : typeElements) {

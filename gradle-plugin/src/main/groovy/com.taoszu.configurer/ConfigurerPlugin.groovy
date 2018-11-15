@@ -7,9 +7,11 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+import java.util.regex.Matcher
+
 class ConfigurerPlugin implements Plugin<Project> {
 
-    String DEFAULT_PROCESSOR_VERSION = "1.1.5"
+    String DEFAULT_PROCESSOR_VERSION = "1.1.5.1"
 
     @Override
     void apply(Project project) {
@@ -54,9 +56,10 @@ class ConfigurerPlugin implements Plugin<Project> {
          */
         def android = project.extensions.findByName("android")
         if (android) {
-            android.defaultConfig.javaCompileOptions.annotationProcessorOptions.argument(PluginConstant.MODULE_NAME, project.name)
+            def moduleName = stringFilter(project.name)
+            android.defaultConfig.javaCompileOptions.annotationProcessorOptions.argument(PluginConstant.MODULE_NAME, moduleName)
             android.productFlavors.all {
-                it.javaCompileOptions.annotationProcessorOptions.argument(PluginConstant.MODULE_NAME, project.name)
+                it.javaCompileOptions.annotationProcessorOptions.argument(PluginConstant.MODULE_NAME, moduleName)
             }
         }
 
@@ -67,6 +70,13 @@ class ConfigurerPlugin implements Plugin<Project> {
             def transform = new ConfigurerTransform(project)
             android.registerTransform(transform)
         }
+    }
+
+
+    private String stringFilter(String str) {
+        def regEx = /['’‘；。.“”！!;\]\[]/
+        Matcher m = str =~ regEx
+        return m.replaceAll("").trim()
     }
 
 }

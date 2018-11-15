@@ -14,7 +14,7 @@ public interface Constant {
 
 
 
-  String FACTORY_TEMP_REPO_SUFFIX = "FactoryTempRepo";
+  String FACTORY_TEMP_REPO_PREFIX = "FactoryTempRepo_";
 
   String FACTORY_TEMP_DIR = "com.taoszu.configurer.temp";
 
