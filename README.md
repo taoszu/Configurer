@@ -57,7 +57,7 @@
    
    *  在类增加注解Factory
      
-    ```
+    ```java
      @Factory(module = "IT")
      public class ITFactory implements BaseFactory<BaseProgramer> {
         Map<String, BaseProgramer> baseProgramerMap;
